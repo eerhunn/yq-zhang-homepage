@@ -1,67 +1,79 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<!doctype html>
+<html lang="zh-CN" data-type="software" data-motion="on">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="YQ Zhang 的 AI Agent 实践记录与个人主页。">
-  <title>YQ Zhang · AI Agent 实践记录</title>
-  <style>
-    :root { --ink:#ebf0ff; --muted:#aab6d1; --night:#070a13; --panel:rgba(19,27,49,.76); --line:rgba(194,211,255,.15); --cyan:#6de5ff; --violet:#ab91ff; --lime:#b7f37c; --coral:#ff9c8a; }
-    * { box-sizing:border-box; } html { scroll-behavior:smooth; scroll-padding-top:88px; }
-    body { margin:0; color:var(--ink); background:var(--night); font-family:Inter,"PingFang SC","Microsoft YaHei",ui-sans-serif,system-ui,sans-serif; line-height:1.7; overflow-x:hidden; }
-    body::before { content:""; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 8% 0%,rgba(109,229,255,.18),transparent 27rem),radial-gradient(circle at 94% 38%,rgba(171,145,255,.18),transparent 32rem),radial-gradient(circle at 52% 100%,rgba(183,243,124,.09),transparent 28rem),linear-gradient(150deg,#070a13 0%,#111934 55%,#070a13 100%); }
-    .grid { position:fixed; inset:0; z-index:-1; opacity:.24; background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:52px 52px; mask-image:linear-gradient(to bottom,black,transparent 74%); }
-    .shell { width:min(1120px,calc(100% - 40px)); margin:0 auto; } .topbar { position:sticky; top:0; z-index:10; backdrop-filter:blur(16px); background:rgba(7,10,19,.72); border-bottom:1px solid var(--line); }
-    nav { min-height:70px; display:flex; align-items:center; justify-content:space-between; gap:20px; } .brand { color:var(--ink); font-size:.82rem; font-weight:850; letter-spacing:.14em; text-decoration:none; white-space:nowrap; }
-    .nav-links { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:5px; } .nav-links a { padding:6px 9px; border-radius:8px; color:var(--muted); font-size:.83rem; text-decoration:none; } .nav-links a:hover { color:var(--cyan); background:rgba(109,229,255,.09); }
-    .hero { min-height:77vh; display:grid; align-content:center; padding:74px 0 88px; } .eyebrow,.section-label { margin:0; color:var(--cyan); font-size:.76rem; font-weight:800; letter-spacing:.18em; text-transform:uppercase; }
-    h1 { max-width:900px; margin:18px 0; font-size:clamp(3.3rem,10vw,8.4rem); letter-spacing:-.075em; line-height:.86; } h1 span { display:block; color:transparent; -webkit-text-stroke:1px rgba(235,240,255,.8); }
-    .hero-copy { max-width:650px; color:var(--muted); font-size:clamp(1rem,2vw,1.17rem); } .hero-meta,.button-row { display:flex; flex-wrap:wrap; gap:9px; margin-top:23px; } .button-row { gap:12px; margin-top:30px; }
-    .pill { padding:5px 10px; border:1px solid var(--line); border-radius:999px; color:#d8e1f7; font-size:.8rem; } .button { display:inline-flex; align-items:center; padding:11px 17px; border:1px solid rgba(109,229,255,.6); border-radius:999px; color:var(--cyan); font-weight:750; text-decoration:none; transition:.2s; } .button:hover { transform:translateY(-3px); background:var(--cyan); color:#07101d; } .button.secondary { border-color:var(--line); color:var(--muted); } .button.secondary:hover { background:#171f38; color:var(--ink); }
-    section { padding:94px 0; } h2 { margin:9px 0 28px; font-size:clamp(2.2rem,5vw,4.3rem); letter-spacing:-.055em; line-height:1; } h3 { margin:0; font-size:1.15rem; line-height:1.35; } .section-copy { max-width:680px; color:var(--muted); margin:-8px 0 31px; }
-    .profile { display:grid; grid-template-columns:.82fr 1.18fr; gap:16px; } .identity,.detail-card,.prompt-box,.contact-card { border:1px solid var(--line); border-radius:18px; background:var(--panel); backdrop-filter:blur(10px); }
-    .identity { min-height:250px; display:grid; align-content:space-between; padding:25px; background:linear-gradient(145deg,rgba(109,229,255,.12),rgba(171,145,255,.1)),var(--panel); } .monogram { font-size:4.7rem; font-weight:900; letter-spacing:-.1em; line-height:1; } .identity p,.detail-card p { margin:0; color:var(--muted); } .identity strong { display:block; font-size:1.25rem; }
-    .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; } .detail-card { padding:23px; } .detail-card:nth-child(2) { background:linear-gradient(145deg,rgba(171,145,255,.13),transparent),var(--panel); } .detail-card:nth-child(3) { background:linear-gradient(145deg,rgba(183,243,124,.09),transparent),var(--panel); } .kicker { margin:0 0 9px!important; color:var(--cyan)!important; font-size:.75rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
-    .timeline { display:grid; gap:14px; counter-reset:flow; } .step { display:grid; grid-template-columns:52px 1fr; gap:18px; padding:23px; border:1px solid var(--line); border-radius:16px; background:var(--panel); } .step::before { counter-increment:flow; content:"0" counter(flow); display:grid; place-items:center; width:42px; height:42px; border-radius:12px; background:rgba(109,229,255,.12); color:var(--cyan); font-family:ui-monospace,Consolas,monospace; font-size:.82rem; font-weight:800; } .step:nth-child(2)::before { color:var(--violet); background:rgba(171,145,255,.13); } .step:nth-child(3)::before { color:var(--lime); background:rgba(183,243,124,.12); } .step p { margin:6px 0 0; color:var(--muted); }
-    .prompt-box { padding:25px; overflow:hidden; } .prompt-box header { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:17px; } .dots { display:flex; gap:6px; } .dots i { width:9px; height:9px; border-radius:50%; background:var(--coral); } .dots i:nth-child(2) { background:#f4cf69; } .dots i:nth-child(3) { background:var(--lime); } pre { margin:0; padding:18px; overflow:auto; border:1px solid rgba(109,229,255,.15); border-radius:12px; background:rgba(4,7,15,.64); color:#d7e6ff; font:.9rem/1.75 ui-monospace,"Cascadia Code",Consolas,monospace; white-space:pre-wrap; } .prompt-tip { margin:16px 0 0; color:var(--muted); }
-    .result { display:grid; grid-template-columns:1fr 1fr; gap:16px; } .result-card { padding:26px; border-radius:18px; background:linear-gradient(140deg,rgba(183,243,124,.11),transparent 65%),var(--panel); border:1px solid var(--line); } .result-card p { color:var(--muted); } .check { color:var(--lime)!important; font-weight:850; }
-    .experience-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; } .experience-card { padding:26px; border:1px solid var(--line); border-radius:18px; background:var(--panel); } .experience-card:nth-child(1) { border-top:3px solid var(--cyan); } .experience-card:nth-child(2) { border-top:3px solid var(--violet); } .experience-card:nth-child(3) { border-top:3px solid var(--lime); } .experience-card p { margin:12px 0 0; color:var(--muted); } .experience-summary { max-width:760px; margin:25px 0 0; padding:20px 24px; border-left:2px solid var(--cyan); background:rgba(109,229,255,.06); color:var(--muted); }
-    .contact-card { display:flex; align-items:center; justify-content:space-between; gap:25px; padding:28px; background:linear-gradient(130deg,rgba(109,229,255,.12),rgba(171,145,255,.13)),var(--panel); } .contact-card p { margin:7px 0 0; color:var(--muted); } .email { color:var(--cyan); font-size:clamp(1.05rem,2vw,1.3rem); font-weight:800; text-decoration:none; white-space:nowrap; } .email:hover { text-decoration:underline; } footer { padding:36px 0; border-top:1px solid var(--line); color:var(--muted); font-size:.86rem; } footer p { margin:0; }
-    @media (max-width:760px) { .profile,.result,.experience-grid { grid-template-columns:1fr; } .contact-card { display:block; } .email { display:inline-block; margin-top:18px; } .nav-links a { padding-inline:5px; } section { padding:68px 0; } .hero { min-height:70vh; } } @media (max-width:460px) { .detail-grid { grid-template-columns:1fr; } }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="page-type" content="software">
+  <meta name="site-kind" content="software">
+  <meta name="theme-color" content="#f7f3e9">
+  <meta name="description" content="YQ Zhang 的人工智能概论课程作品集，记录 Codex 建站和 MLP 学习 XOR 的实践。">
+  <meta property="og:title" content="YQ Zhang 的 AI 实践笔记">
+  <meta property="og:description" content="两次人工智能概论课程作业：Codex 建站与 XOR 实验。">
+  <title>YQ Zhang 的 AI 实践笔记</title>
+  <link rel="stylesheet" href="journal.css">
 </head>
 <body>
-  <div class="grid"></div>
-  <header class="topbar"><nav class="shell" aria-label="页面导航"><a class="brand" href="#top">YQ ZHANG / 2026</a><div class="nav-links"><a href="#profile">Profile</a><a href="#process">Process</a><a href="#experience">Experience</a><a href="mlp.html">MLP 作业</a><a href="#contact">Contact</a></div></nav></header>
-  <main id="top" class="shell">
-    <section class="hero" aria-labelledby="hero-title"><p class="eyebrow">Artificial Intelligence · Course Practice</p><h1 id="hero-title">THIS IS<span>MY WORLD.</span></h1><p class="hero-copy">A personal homepage and a record of using Codex to turn clear requirements into a working web page.</p><div class="hero-meta" aria-label="个人标签"><span class="pill">YQ Zhang</span><span class="pill">数据科学与大数据技术</span><span class="pill">Codex Practice</span></div><div class="button-row"><a class="button" href="#process">查看实践过程 ↓</a><a class="button secondary" href="#contact">联系我</a></div></section>
-    <section id="profile" aria-labelledby="profile-title"><p class="section-label">01 / Profile</p><h2 id="profile-title">Who is<br>behind the screen?</h2><div class="profile"><article class="identity"><div class="monogram">YQ</div><div><strong>YQ Zhang</strong><p>个人主页 · 课程实践记录</p></div></article><div class="detail-grid"><article class="detail-card"><p class="kicker">Major</p><h3>数据科学与<br>大数据技术</h3></article><article class="detail-card"><p class="kicker">Tool</p><h3>Codex</h3><p>用于协助网页的结构设计、内容调整与代码实现。</p></article><article class="detail-card"><p class="kicker">Current Project</p><h3>个人主页</h3><p>以静态网页形式制作，已发布到 GitHub Pages。</p></article><article class="detail-card"><p class="kicker">Focus</p><h3>清晰提示词</h3><p>把目标、内容边界和风格要求说明白，再进行逐步修改。</p></article></div></div></section>
-    <section id="process" aria-labelledby="process-title"><p class="section-label">02 / Process</p><h2 id="process-title">From an idea<br>to a page.</h2><p class="section-copy">以下记录本次个人主页制作中已完成的真实步骤；每一步都围绕“明确需求—生成初稿—继续修改”展开。</p><div class="timeline"><article class="step"><div><h3>确定页面目标与内容边界</h3><p>将页面定位为个人主页和课程实践记录，确认展示姓名、专业、联系方式与网页制作过程；只写实际完成的内容。</p></div></article><article class="step"><div><h3>使用 Codex 制作静态网页</h3><p>在本地创建 <code>index.html</code>，由 HTML 组织内容、CSS 控制视觉效果，并在浏览器中查看页面结果。</p></div></article><article class="step"><div><h3>通过提示词迭代页面</h3><p>根据页面用途提出具体修改：英文首页表达、深色科技感、多样化卡片布局、移除不想展示的内容，并保留可自行填写的联系方式入口。</p></div></article></div></section>
-    <section aria-labelledby="prompt-title"><p class="section-label">03 / Prompt Refinement</p><h2 id="prompt-title">Make the request<br>specific.</h2><p class="section-copy">下面是根据本次作业整理出的可复用提示词。它不是运行结果或虚构经历，而是一份用于提高协作效率的需求模板。</p><article class="prompt-box"><header><h3>个人主页制作提示词</h3><div class="dots" aria-hidden="true"><i></i><i></i><i></i></div></header><pre>请帮我制作一个个人主页，用于人工智能概论课程作业。
-
-我的真实信息：姓名为 YQ Zhang，专业是数据科学与大数据技术；
-本次实践使用 Codex 制作网页，并已发布到 GitHub Pages。
-
-页面需要包含：个人信息、网页制作过程、使用体验和联系方式。
-联系方式公开 QQ 邮箱：2640325337@qq.com。
-
-请使用深色科技感与多样化卡片布局，适配手机屏幕。
-不要编造我未完成的项目、数据、使用时长或未经确认的个人经历。</pre><p class="prompt-tip">提示词的关键：先给事实，再给目标、内容清单、风格与限制条件。这样生成的内容更容易核对和修改。</p></article></section>
-    <section id="experience" aria-labelledby="experience-title">
-      <p class="section-label">04 / User Experience</p>
-      <h2 id="experience-title">What I noticed<br>while building.</h2>
-      <p class="section-copy">以下是我在使用 Codex 制作这个网页时的个人体验。</p>
-      <div class="experience-grid">
-        <article class="experience-card"><h3>网页制作会消耗较多 Token</h3><p>页面结构、样式和文案往往需要多轮生成与修改。需求不够明确时，反复返工会增加 Token 消耗。因此我会先整理内容和修改目标，再提出具体要求。</p></article>
-        <article class="experience-card"><h3>信息收集能力仍有局限</h3><p>我感觉 AI 在收集作业要求和个人材料时，难以自动补齐缺失的信息。老师的具体要求不清楚时，仍需要我向同学确认、查看参考网页，并决定哪些内容能真实展示。</p></article>
-        <article class="experience-card"><h3>检索质量取决于输入</h3><p>让 AI 自行检索时，我感受到“Garbage in, garbage out”：问题含糊或来源不可靠，就容易得到无关或不准确的答案。我需要把问题说清楚，核对来源，再判断结果是否适合自己的作业。</p></article>
+  <a class="skip" href="#top">跳到正文</a>
+  <header class="masthead">
+    <nav class="wrap nav-centre" aria-label="页面导航">
+      <a class="brand" href="index.html" aria-current="page">YQ Zhang</a>
+      <div class="nav-links">
+        <a href="index.html#process">建站手记</a>
+        <a href="mlp.html">XOR 实验</a>
       </div>
-      <p class="experience-summary">这次实践让我更重视两件事：先整理可靠的事实，再把需求讲具体。AI 可以加快实现，但页面内容和最终判断仍要由我负责。</p>
+    </nav>
+  </header>
+  <main id="top" tabindex="-1">
+    <section class="wrap cover" data-enter>
+      <div>
+        <p class="kicker">人工智能概论 / 课程作品集</p>
+        <h1>YQ Zhang 的<br><span>AI 实践笔记</span></h1>
+        <p class="lede">两次作业记录了两件事：我怎样和 Codex 合作发布个人主页，以及一个小型神经网络怎样学会 XOR。</p>
+        <div class="actions">
+          <a class="button" href="#process">阅读建站手记</a>
+          <a class="button button-outline" href="mlp.html">打开 XOR 实验 ↗</a>
+        </div>
+      </div>
+      <a class="specimen" href="mlp.html" aria-label="打开 XOR 实验，查看四个样本的预测概率">
+        <div class="specimen-head"><span>02 / XOR</span><span>第 300 轮 ↗</span></div>
+        <div class="specimen-grid" aria-hidden="true">
+          <div><small>(0, 1)</small><strong>0.975</strong></div>
+          <div class="specimen-blue"><small>(1, 1)</small><strong>0.031</strong></div>
+          <div class="specimen-blue"><small>(0, 0)</small><strong>0.029</strong></div>
+          <div><small>(1, 0)</small><strong>0.975</strong></div>
+        </div>
+        <div class="specimen-foot"><span>四个训练样本</span><span>预测为 1 的概率</span></div>
+      </a>
     </section>
-    <section aria-labelledby="result-title"><p class="section-label">05 / Current Result</p><h2 id="result-title">A homepage,<br>now online.</h2><div class="result"><article class="result-card"><p class="check">✓ 已完成</p><h3>网页已发布</h3><p>个人主页已发布到 GitHub Pages，包含个人信息、实践过程、提示词模板、使用体验和联系方式。</p><a class="button" href="https://eerhunn.github.io/yq-zhang-homepage/">访问在线主页 ↗</a></article><article class="result-card"><p class="check">→ 持续完善</p><h3>记录新的实践</h3><p>以后完成新的编程练习或项目时，可以在这个主页补充真实的作品与学习记录。</p></article></div></section>
-    <section id="contact" aria-labelledby="contact-title"><p class="section-label">06 / Contact</p><h2 id="contact-title">Let's connect.</h2><article class="contact-card"><div><h3>YQ Zhang</h3><p>数据科学与大数据技术 · 欢迎通过邮箱联系。</p></div><a class="email" href="mailto:2640325337@qq.com">2640325337@qq.com</a></article></section>
+
+    <section class="wrap editorial" id="process" aria-labelledby="story-title">
+      <div class="section-head">
+        <p class="kicker">作业 01 / 与 Codex 协作</p>
+        <h2 id="story-title">从不会做网页<br>到发布个人主页</h2>
+      </div>
+      <ol class="story">
+        <li><div><h3>先把第一页打开</h3><p>我一开始只想有个地方展示编程作品，但没做过网站。Codex 帮我写出第一版 <code>index.html</code>。在浏览器里打开它以后，我才开始把标题、内容和布局的要求讲具体。</p></div></li>
+        <li><div><h3>预览后再提修改</h3><p>我先调整首页文案，再根据同学的参考页面把专题改成 AI Agent 实践记录。参考能帮我理解常见做法，课程的具体要求仍要自己确认。</p></div></li>
+        <li><div><h3>把本地页面发布出去</h3><p>我在 GitHub 创建仓库，上传网页文件，再启用 GitHub Pages。这样老师和同学可以直接通过链接访问页面。</p></div></li>
+      </ol>
+    </section>
+
+    <section class="wrap editorial" id="experience" aria-labelledby="experience-title">
+      <div class="section-head">
+        <p class="kicker">协作复盘</p>
+        <h2 id="experience-title">哪些事需要我来判断</h2>
+      </div>
+      <div class="notes">
+        <article><h3>先说清修改范围</h3><p>结构、文案和样式一起返工会消耗更多 Token。我会先说清这次要改的位置和期望结果，再打开页面核对。</p></article>
+        <article><h3>作业要求要向人确认</h3><p>我记不清老师的要求时，Codex 无法从缺失的信息里补出答案。我需要跟同学核对，再决定页面该写什么。</p></article>
+        <article><h3>检索结果要看来源</h3><p>问题含糊或参考来源不可靠，检索结果就可能偏题。我会先缩小问题范围，再核对结论是否适合放进自己的作业。</p></article>
+      </div>
+    </section>
+    <section class="wrap author" id="profile" aria-labelledby="author-title">
+      <div><p class="kicker">作者</p><h2 id="author-title">YQ Zhang</h2><p>数据科学与大数据技术</p></div>
+      <a id="contact" href="mailto:2640325337@qq.com">2640325337@qq.com</a>
+    </section>
   </main>
-  <footer class="shell"><p>© <span id="year"></span> YQ Zhang · Built with Codex.</p></footer>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <footer class="wrap footer"><span>YQ Zhang</span><span>人工智能概论课程作品集</span></footer>
 </body>
 </html>

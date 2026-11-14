@@ -1,53 +1,46 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-type="software" data-motion="on">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MLP 怎样学习 XOR · YQ Zhang</title>
+  <meta name="theme-color" content="#f7f3e9">
+  <meta name="page-type" content="software">
+  <meta name="site-kind" content="software">
+  <meta name="description" content="用曲线、参数表和预测热图观察 MLP 学习 XOR 的 300 轮训练。">
+  <meta property="og:title" content="MLP 怎样学习 XOR · YQ Zhang">
+  <meta property="og:description" content="用曲线、参数表和预测热图观察 MLP 学习 XOR 的 300 轮训练。">
+  <link rel="stylesheet" href="journal.css">
   <script defer src="mlp.js"></script>
-  <style>
-    :root {color-scheme:dark; --ink:#eef4ff; --muted:#b0bfd8; --line:#2e4262; --accent:#66ddff; --panel:#131f34}
-    * {box-sizing:border-box}
-    body {margin:0; background:#0a1425; color:var(--ink); font:16px/1.65 system-ui,"Microsoft YaHei",sans-serif}
-    main {width:min(1100px,calc(100% - 32px)); margin:auto; padding:32px 0 60px}
-    a {color:var(--accent); text-underline-offset:4px}
-    header {padding:32px 0 24px}
-    h1 {font-size:clamp(2.1rem,6vw,4.2rem); line-height:1.12; margin:0 0 12px}
-    h2 {font-size:1.25rem; margin:0 0 10px}
-    p {margin:0 0 12px}
-    .intro,.caption,figcaption {color:var(--muted)}
-    .panel {border:1px solid var(--line); border-radius:16px; padding:20px; background:var(--panel); min-width:0}
-    .grid {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:16px 0}
-    .controls,.metrics {display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .metrics {margin-top:14px; gap:16px}
-    .metrics strong,output {color:var(--accent); font-variant-numeric:tabular-nums}
-    .slider {display:block; width:100%; margin:8px 0 12px; accent-color:var(--accent)}
-    button,select {font:inherit; border:1px solid var(--line); border-radius:8px; padding:6px 12px; background:#202f4a; color:var(--ink)}
-    button {cursor:pointer}
-    button:hover {border-color:var(--accent)}
-    button:focus-visible,select:focus-visible,a:focus-visible,input:focus-visible {outline:2px solid var(--accent); outline-offset:3px}
-    #play {background:#125270; border-color:#4385a3}
-    canvas {display:block; width:100%; height:auto; margin-top:8px}
-    #map {max-width:300px; margin:0 auto}
-    figure {margin:0}
-    table {border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums}
-    td,th {text-align:left; padding:5px 6px; border-bottom:1px solid var(--line)}
-    th {font-weight:550}
-    code {color:#d5e8ff; overflow-wrap:anywhere}
-    footer {margin-top:24px;color:var(--muted)}
-    @media(max-width:720px) { .grid {grid-template-columns:1fr} }
-  </style>
 </head>
 <body>
-<main>
-  <a href="index.html">← 返回个人主页</a>
-  <header>
-    <p class="caption">人工智能概论 · 第二次作业 · YQ Zhang</p>
-    <h1>MLP 怎样学习 XOR</h1>
-    <p class="intro">两个输入不同时，XOR 输出 1。四个样本的两类点分别位于对角线上，一条直线无法将它们分开。下面用两个隐藏神经元观察权重和偏置如何随训练变化。</p>
+<a class="skip" href="#top">跳到正文</a>
+<header class="masthead">
+  <nav class="wrap nav-centre" aria-label="页面导航">
+    <a class="brand" href="index.html">YQ Zhang</a>
+    <div class="nav-links">
+      <a href="index.html#process">建站手记</a>
+      <a href="mlp.html" aria-current="page">XOR 实验</a>
+    </div>
+  </nav>
+</header>
+<main id="top" class="wrap experiment" tabindex="-1">
+  <header class="cover experiment-cover" data-enter>
+    <div>
+      <p class="kicker">人工智能概论 / 作业 02</p>
+      <h1>MLP 怎样<br><span>学习 XOR</span></h1>
+      <p class="lede">两个输入不同时，XOR 输出 1。两类样本分居对角线，一条直线无法分开它们。这个实验用两个隐藏神经元解决分类问题。</p>
+      <div class="actions"><a class="button" href="#training">查看训练过程 ↓</a></div>
+    </div>
+    <div class="experiment-result">
+      <p class="kicker">实验结果 / 300 轮</p>
+      <p class="result-number">4<span> / 4</span></p>
+      <p>四个训练样本分类正确</p>
+      <div class="result-loss"><span>平均损失</span><strong>0.5620 → 0.0279</strong></div>
+    </div>
   </header>
-  <section class="panel" aria-labelledby="training">
-    <h2 id="training">训练进度</h2>
+  <section class="panel" id="training" aria-labelledby="training-title">
+    <h2 id="training-title">训练进度</h2>
     <p class="caption">2 个输入 → 2 个 sigmoid 隐藏单元 → 1 个输出。4 个 XOR 样本整批训练，二元交叉熵，Adam 学习率 0.03，共 300 轮。</p>
     <label for="epoch">选择训练轮次 <output id="epoch-value" for="epoch">0</output> / 300</label>
     <input class="slider" id="epoch" type="range" min="0" max="300" value="0">
@@ -58,19 +51,19 @@
   <div class="grid">
     <figure class="panel">
       <h2>损失曲线</h2>
+      <p class="caption">横轴为训练轮次，纵轴为四个样本的平均二元交叉熵。圆点标出所选轮次。</p>
       <canvas id="loss" width="500" height="220" role="img"></canvas>
-      <figcaption>横轴为训练轮次，纵轴为四个样本的平均二元交叉熵。圆点标出所选轮次。</figcaption>
     </figure>
     <figure class="panel">
       <h2>参数轨迹</h2>
       <label for="parameter">选择权重或偏置</label> <select id="parameter"></select>
+      <p class="caption">横轴为训练轮次，纵轴为所选参数的数值。可切换查看全部 9 个参数。</p>
       <canvas id="trace" width="500" height="220" role="img"></canvas>
-      <figcaption>横轴为训练轮次，纵轴为所选参数的数值。可切换查看全部 9 个参数。</figcaption>
     </figure>
     <figure class="panel">
       <h2>输入空间里的预测</h2>
+      <p class="caption">蓝色偏向类别 0，橙色偏向类别 1。黑色圆点标出四个训练样本，圆点内是实际标签。</p>
       <canvas id="map" width="300" height="300" role="img" aria-label="XOR 输入平面的预测概率热图，具体样本预测见下表"></canvas>
-      <figcaption>蓝色偏向类别 0，橙色偏向类别 1。黑色圆点标出四个训练样本，圆点内是实际标签。</figcaption>
     </figure>
     <section class="panel">
       <h2>权重与偏置</h2>
@@ -80,7 +73,7 @@
       </table>
     </section>
   </div>
-  <div class="grid">
+  <div class="grid analysis-grid">
     <section class="panel">
       <h2>四个样本的预测</h2>
       <table aria-label="XOR 样本的预测结果">
@@ -97,7 +90,7 @@
       <p>例如，权重 W₁₁ 从 2.0000 增至 6.1371。切换到它的参数曲线，再拖动轮次滑块，可以对照同一轮的权重和预测变化。</p>
     </section>
   </div>
-  <footer>参考 <a href="https://zhumy.github.io/Introduction_to_Artificial_Intelligence/#v7-p034c">课程第二篇第 15 节的 MLP 示例</a> · <a href="mlp.js">查看浏览器端实现</a> · <a href="mlp.py" download>下载 PyTorch 复现代码</a></footer>
+  <footer class="footer sources"><span>参考 <a href="https://zhumy.github.io/Introduction_to_Artificial_Intelligence/#v7-p034c">课程第二篇第 15 节的 MLP 示例</a></span><a href="mlp.js">查看浏览器端实现</a><a href="mlp.py" download>下载 PyTorch 复现代码</a></footer>
 </main>
 </body>
 </html>
