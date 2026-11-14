@@ -11,6 +11,10 @@
   <meta property="og:title" content="MLP 怎样学习 XOR · YQ Zhang">
   <meta property="og:description" content="用曲线、参数表和预测热图观察 MLP 学习 XOR 的 300 轮训练。">
   <link rel="stylesheet" href="journal.css">
+  <style>
+    .python-source { margin: 0 0 1.5rem; }
+    .python-source pre { margin: 0; padding: clamp(.8rem, 3vw, 1.4rem); border: 1px solid var(--line); background: var(--wash); font: .9rem/1.65 "Cascadia Mono", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4; }
+  </style>
   <script defer src="mlp.js"></script>
 </head>
 <body>
@@ -90,6 +94,51 @@
       <p>例如，权重 W₁₁ 从 2.0000 增至 6.1371。切换到它的参数曲线，再拖动轮次滑块，可以对照同一轮的权重和预测变化。</p>
     </section>
   </div>
+  <section class="panel python-source" id="python-source" aria-labelledby="python-title">
+    <h2 id="python-title">完整 Python 源码</h2>
+    <p class="caption">安装 PyTorch 后运行 <code>python mlp.py</code>，即可复现 300 轮训练并查看损失、预测概率和最终参数。</p>
+    <pre><code class="language-python">
+"""Reproduce the XOR experiment with PyTorch: python mlp.py."""
+import torch
+from torch.nn import Parameter
+from torch.nn.functional import binary_cross_entropy_with_logits
+
+
+def main():
+    inputs = torch.tensor([[0., 0.], [0., 1.], [1., 0.], [1., 1.]])
+    targets = torch.tensor([[0.], [1.], [1.], [0.]])
+    weights = Parameter(torch.tensor([[2., -2.], [-2., 2.]]))
+    hidden_bias = Parameter(torch.tensor([-1., -1.]))
+    output_weights = Parameter(torch.tensor([[3.], [3.]]))
+    output_bias = Parameter(torch.tensor([-2.5]))
+    optimizer = torch.optim.Adam(
+        [weights, hidden_bias, output_weights, output_bias], lr=0.03
+    )
+
+    for epoch in range(301):
+        hidden = torch.sigmoid(inputs @ weights + hidden_bias)
+        logits = hidden @ output_weights + output_bias
+        loss = binary_cross_entropy_with_logits(logits, targets)
+        if epoch in (0, 100, 200, 300):
+            probabilities = logits.detach().sigmoid().flatten()
+            print(f"Epoch {epoch:3d} | loss {loss.item():.6f} | p(1) {probabilities.tolist()}")
+        if epoch == 300:
+            break
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+    for name, value in (
+        ("W", weights), ("b_hidden", hidden_bias),
+        ("v", output_weights), ("b_output", output_bias),
+    ):
+        print(f"{name} = {value.detach().tolist()}")
+
+
+if __name__ == "__main__":
+    main()
+    </code></pre>
+  </section>
   <footer class="footer sources"><span>参考 <a href="https://zhumy.github.io/Introduction_to_Artificial_Intelligence/#v7-p034c">课程第二篇第 15 节的 MLP 示例</a></span><a href="mlp.js">查看浏览器端实现</a><a href="mlp.py" download>下载 PyTorch 复现代码</a></footer>
 </main>
 </body>
