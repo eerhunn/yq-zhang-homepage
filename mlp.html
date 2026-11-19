@@ -96,9 +96,11 @@
   </div>
   <section class="panel python-source" id="python-source" aria-labelledby="python-title">
     <h2 id="python-title">完整 Python 源码</h2>
+    <p class="caption">两份实现使用相同的 XOR 样本、2–2–1 网络和初始参数，以二元交叉熵和 Adam（学习率 0.03）训练 300 轮。PyTorch 用 autograd 计算梯度，TensorFlow 用 GradientTape。不同框架的 Adam 默认 epsilon 与数值计算可能带来细微差异。</p>
+    <nav class="actions" aria-label="Python 源码导航"><a class="button button-outline" href="#pytorch-source">查看 PyTorch</a><a class="button button-outline" href="#tensorflow-source">查看 TensorFlow</a></nav>
+    <h3 id="pytorch-source">PyTorch 完整实现</h3>
     <p class="caption">安装 PyTorch 后运行 <code>python mlp.py</code>，即可复现 300 轮训练并查看损失、预测概率和最终参数。</p>
-    <pre><code class="language-python">
-"""Reproduce the XOR experiment with PyTorch: python mlp.py."""
+    <pre><code class="language-python">"""Reproduce the XOR experiment with PyTorch: python mlp.py."""
 import torch
 from torch.nn import Parameter
 from torch.nn.functional import binary_cross_entropy_with_logits
@@ -137,7 +139,52 @@ def main():
 
 if __name__ == "__main__":
     main()
-    </code></pre>
+</code></pre>
+  </section>
+  <section class="panel python-source" id="tensorflow-source" aria-labelledby="tensorflow-title">
+    <h2 id="tensorflow-title">TensorFlow 完整实现</h2>
+    <p class="caption">安装 TensorFlow 后运行 <code>python mlp_tensorflow.py</code>。同样输出第 0、100、200、300 轮的损失和预测概率，以及最终权重和偏置。</p>
+    <pre><code class="language-python">"""Reproduce the XOR experiment with TensorFlow: python mlp_tensorflow.py."""
+import tensorflow as tf
+
+
+def main():
+    inputs = tf.constant([[0., 0.], [0., 1.], [1., 0.], [1., 1.]])
+    targets = tf.constant([[0.], [1.], [1.], [0.]])
+    weights = tf.Variable([[2., -2.], [-2., 2.]])
+    hidden_bias = tf.Variable([-1., -1.])
+    output_weights = tf.Variable([[3.], [3.]])
+    output_bias = tf.Variable([-2.5])
+    parameters = [weights, hidden_bias, output_weights, output_bias]
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.03)
+
+    for epoch in range(301):
+        with tf.GradientTape() as tape:
+            hidden = tf.sigmoid(tf.matmul(inputs, weights) + hidden_bias)
+            logits = tf.matmul(hidden, output_weights) + output_bias
+            loss = tf.reduce_mean(
+                tf.nn.sigmoid_cross_entropy_with_logits(
+                    labels=targets, logits=logits
+                )
+            )
+        if epoch in (0, 100, 200, 300):
+            probabilities = tf.sigmoid(logits).numpy().flatten().tolist()
+            print(f"Epoch {epoch:3d} | loss {float(loss.numpy()):.6f} | p(1) {probabilities}")
+        if epoch == 300:
+            break
+        gradients = tape.gradient(loss, parameters)
+        optimizer.apply_gradients(zip(gradients, parameters))
+
+    for name, value in (
+        ("W", weights), ("b_hidden", hidden_bias),
+        ("v", output_weights), ("b_output", output_bias),
+    ):
+        print(f"{name} = {value.numpy().tolist()}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+    <a class="button button-outline" href="mlp_tensorflow.py" download>下载 TensorFlow 复现代码</a>
   </section>
   <footer class="footer sources"><span>参考 <a href="https://zhumy.github.io/Introduction_to_Artificial_Intelligence/#v7-p034c">课程第二篇第 15 节的 MLP 示例</a></span><a href="mlp.js">查看浏览器端实现</a><a href="mlp.py" download>下载 PyTorch 复现代码</a></footer>
 </main>
